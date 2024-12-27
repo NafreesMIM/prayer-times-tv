@@ -3,37 +3,236 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Muslim Prayer Times</title>
-  <link rel="stylesheet" href="style.css">
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet"> <!-- Added Google Font -->
+  <title>Prayer Times</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Poppins', sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background: linear-gradient(to bottom, #2c3e50, #3498db);
+      color: white;
+      text-align: center;
+    }
+
+    .container {
+      background: rgba(0, 0, 0, 0.8);
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+      width: 90%;
+      max-width: 800px;
+    }
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .header h1 {
+      font-weight: 600;
+      font-size: 2.5em;
+      margin: 0;
+    }
+
+    .switch-lang {
+      font-size: 1em;
+      font-weight: 600;
+      color: #fff;
+      background: #16a085;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+    .switch-lang:hover {
+      background: #1abc9c;
+    }
+
+    .sub-header {
+      font-size: 1.2em;
+      margin: 10px 0 20px;
+    }
+
+    .prayer-times {
+      margin: 20px 0;
+    }
+
+    .prayer {
+      display: flex;
+      justify-content: space-between;
+      margin: 10px 0;
+      padding: 10px;
+      font-size: 1.5em;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 5px;
+    }
+
+    .footer {
+      margin-top: 20px;
+    }
+
+    .footer p {
+      font-size: 1.2em;
+      margin: 5px 0;
+    }
+
+    #next-prayer {
+      font-weight: 600;
+      font-size: 1.5em;
+    }
+
+    #countdown {
+      font-size: 1.2em;
+      color: #f5a623;
+    }
+  </style>
 </head>
 <body>
   <div class="container">
-    <header>
-      <h1 id="title">Muslim Prayer Times</h1>
-      <p id="today-date"></p>
-      <p id="hijri-date"></p>
-    </header>
+    <div class="header">
+      <h1 id="title">Prayer Times</h1>
+      <button class="switch-lang" id="switch-lang">عربي</button>
+    </div>
+    <p class="sub-header" id="date"></p>
+    <p class="sub-header" id="hijri-date"></p>
 
-    <main>
-      <div id="prayer-times">
-        <p>Loading prayer times...</p>
-      </div>
-      <div id="next-prayer">
-        <h2>Next Prayer</h2>
-        <p id="next-prayer-name">Calculating...</p>
-        <p id="countdown">00:00:00</p>
-      </div>
-    </main>
+    <div class="prayer-times" id="prayer-times">
+      <!-- Prayer times will be dynamically added here -->
+    </div>
 
-    <footer>
-      <button onclick="changeLanguage('en')">English</button>
-      <button onclick="changeLanguage('ar')">Arabic</button>
-      
-        <p>&copy; 2024 Nafrees.MIM | All rights reserved</p>
-    </footer>
+    <div class="footer">
+      <p id="next-prayer"></p>
+      <p id="countdown"></p>
+    </div>
   </div>
 
-  <script src="script.js"></script>
+  <script>
+    const API_URL = "https://api.aladhan.com/v1/timings";
+    let currentLanguage = "en"; // Default language is English
+
+    const translations = {
+      en: {
+        title: "Prayer Times",
+        nextPrayer: "Next Prayer:",
+        timeLeft: "Time Left:",
+      },
+      ar: {
+        title: "مواقيت الصلاة",
+        nextPrayer: "الصلاة التالية:",
+        timeLeft: "الوقت المتبقي:",
+      },
+    };
+
+    async function fetchPrayerTimes(latitude, longitude) {
+      const response = await fetch(`${API_URL}?latitude=${latitude}&longitude=${longitude}&method=2`);
+      const data = await response.json();
+      return data.data;
+    }
+
+    function displayPrayerTimes(prayerTimes) {
+      const prayerTimesElement = document.getElementById("prayer-times");
+      const timings = prayerTimes.timings;
+
+      const selectedPrayers = {
+        Fajr: timings.Fajr,
+        Sunrise: timings.Sunrise,
+        Dhuhr: timings.Dhuhr,
+        Asr: timings.Asr,
+        Sunset: timings.Sunset,
+        Maghrib: timings.Maghrib,
+        Isha: timings.Isha,
+      };
+
+      prayerTimesElement.innerHTML = "";
+
+      for (const [prayer, time] of Object.entries(selectedPrayers)) {
+        const prayerElement = document.createElement("div");
+        prayerElement.classList.add("prayer");
+        prayerElement.innerHTML = `<span>${prayer}</span><span>${time}</span>`;
+        prayerTimesElement.appendChild(prayerElement);
+      }
+    }
+
+    function updateCountdown(prayerTimes) {
+      const timings = prayerTimes.timings;
+      const now = new Date();
+
+      const selectedTimings = {
+        Fajr: timings.Fajr,
+        Sunrise: timings.Sunrise,
+        Dhuhr: timings.Dhuhr,
+        Asr: timings.Asr,
+        Sunset: timings.Sunset,
+        Maghrib: timings.Maghrib,
+        Isha: timings.Isha,
+      };
+
+      let nextPrayer = null;
+      let nextTime = null;
+
+      for (const [prayer, time] of Object.entries(selectedTimings)) {
+        const prayerTime = new Date(`${now.toDateString()} ${time}`);
+        if (prayerTime > now) {
+          nextPrayer = prayer;
+          nextTime = prayerTime;
+          break;
+        }
+      }
+
+      if (nextPrayer && nextTime) {
+        const diff = nextTime - now;
+
+        const hours = String(Math.floor(diff / 3600000)).padStart(2, '0');
+        const minutes = String(Math.floor((diff % 3600000) / 60000)).padStart(2, '0');
+        const seconds = String(Math.floor((diff % 60000) / 1000)).padStart(2, '0');
+
+        document.getElementById("next-prayer").textContent = `${translations[currentLanguage].nextPrayer} ${nextPrayer}`;
+        document.getElementById("countdown").textContent = `${translations[currentLanguage].timeLeft} ${hours}h ${minutes}m ${seconds}s`;
+      } else {
+        document.getElementById("next-prayer").textContent = "No more prayers for today.";
+        document.getElementById("countdown").textContent = "";
+      }
+    }
+
+    function displayHijriDate(prayerTimes) {
+      const hijriDate = prayerTimes.date.hijri;
+      document.getElementById("hijri-date").textContent = `Hijri Date: ${hijriDate.day} ${hijriDate.month.en} ${hijriDate.year}`;
+    }
+
+    function switchLanguage() {
+      currentLanguage = currentLanguage === "en" ? "ar" : "en";
+      document.getElementById("title").textContent = translations[currentLanguage].title;
+      document.getElementById("switch-lang").textContent = currentLanguage === "en" ? "عربي" : "English";
+    }
+
+    async function main() {
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(async (position) => {
+          const latitude = position.coords.latitude;
+          const longitude = position.coords.longitude;
+
+          const prayerTimes = await fetchPrayerTimes(latitude, longitude);
+
+          displayPrayerTimes(prayerTimes);
+          displayHijriDate(prayerTimes);
+          document.getElementById("date").textContent = new Date().toLocaleDateString();
+
+          setInterval(() => updateCountdown(prayerTimes), 1000);
+        });
+      } else {
+        alert("Geolocation is not supported by your browser.");
+      }
+    }
+
+    document.getElementById("switch-lang").addEventListener("click", switchLanguage);
+    main();
+  </script>
 </body>
 </html>
