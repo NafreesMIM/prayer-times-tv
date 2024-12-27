@@ -84,6 +84,7 @@
       font-size: 1.2em;
       margin: 5px 0;
     }
+
     #author {
       font-size: 1.1em;
       margin-top: 10px;
@@ -99,29 +100,6 @@
       font-size: 1.2em;
       color: #f5a623;
     }
-
-    /* Responsive Styles */
-    @media (max-width: 768px) {
-      .container {
-        padding: 15px;
-      }
-
-      .header h1 {
-        font-size: 2em;
-      }
-
-      .prayer {
-        font-size: 1.2em;
-      }
-
-      #next-prayer {
-        font-size: 1.2em;
-      }
-
-      #countdown {
-        font-size: 1em;
-      }
-    }
   </style>
 </head>
 <body>
@@ -132,6 +110,7 @@
     </div>
     <p class="sub-header" id="date"></p>
     <p class="sub-header" id="hijri-date"></p>
+    <p class="sub-header" id="location"></p>
 
     <div class="prayer-times" id="prayer-times">
       <!-- Prayer times will be dynamically added here -->
@@ -145,21 +124,20 @@
   </div>
 
   <script>
+    const API_BASE_URL = "https://api.aladhan.com/v1/timingsByCity";
     let currentLanguage = "en"; // Default language is English
-    let userLatitude = null;
-    let userLongitude = null;
 
     const translations = {
       en: {
         title: "Prayer Times",
         nextPrayer: "Next Prayer:",
         timeLeft: "Time Left:",
+        location: "Location:",
         prayers: {
           Fajr: "Fajr",
           Sunrise: "Sunrise",
           Dhuhr: "Dhuhr",
           Asr: "Asr",
-          Sunset: "Sunset",
           Maghrib: "Maghrib",
           Isha: "Isha"
         }
@@ -168,26 +146,46 @@
         title: "مواقيت الصلاة",
         nextPrayer: "الصلاة التالية:",
         timeLeft: "الوقت المتبقي:",
+        location: "الموقع:",
         prayers: {
           Fajr: "الفجر",
           Sunrise: "الشروق",
           Dhuhr: "الظهر",
           Asr: "العصر",
-          Sunset: "الغروب",
           Maghrib: "المغرب",
           Isha: "العشاء"
         }
       }
     };
 
-    async function fetchPrayerTimes() {
-      if (userLatitude && userLongitude) {
-        const API_URL = `https://api.aladhan.com/v1/timings?latitude=${userLatitude}&longitude=${userLongitude}`;
-        const response = await fetch(API_URL);
-        const data = await response.json();
-        return data.data;
+    async function fetchPrayerTimes(city, country) {
+      const url = `${API_BASE_URL}?city=${city}&country=${country}`;
+      const response = await fetch(url);
+      const data = await response.json();
+      return data.data;
+    }
+
+    async function detectLocation() {
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(async (position) => {
+          const lat = position.coords.latitude;
+          const lon = position.coords.longitude;
+          const geoResponse = await fetch(`https://geocode.xyz/${lat},${lon}?geoit=json`);
+          const geoData = await geoResponse.json();
+
+          const city = geoData.city || "Unknown City";
+          const country = geoData.country || "Unknown Country";
+
+          document.getElementById("location").textContent = `${translations[currentLanguage].location} ${city}, ${country}`;
+          const prayerTimes = await fetchPrayerTimes(city, country);
+          displayPrayerTimes(prayerTimes);
+          displayHijriDate(prayerTimes);
+          startCountdown(prayerTimes);
+        }, (error) => {
+          alert("Unable to detect location. Please enable location services.");
+        });
       } else {
-        alert("Unable to retrieve your location.");
+        alert("Geolocation is not supported by your browser.");
       }
     }
 
@@ -200,7 +198,6 @@
         Sunrise: timings.Sunrise,
         Dhuhr: timings.Dhuhr,
         Asr: timings.Asr,
-        Sunset: timings.Sunset,
         Maghrib: timings.Maghrib,
         Isha: timings.Isha,
       };
@@ -215,81 +212,65 @@
       }
     }
 
-    function updateCountdown(prayerTimes) {
-      const timings = prayerTimes.timings;
-      const now = new Date();
-
-      const selectedTimings = {
-        Fajr: timings.Fajr,
-        Sunrise: timings.Sunrise,
-        Dhuhr: timings.Dhuhr,
-        Asr: timings.Asr,
-        Sunset: timings.Sunset,
-        Maghrib: timings.Maghrib,
-        Isha: timings.Isha,
-      };
-
-      let nextPrayer = null;
-      let nextTime = null;
-
-      for (const [prayer, time] of Object.entries(selectedTimings)) {
-        const prayerTime = new Date(`${now.toDateString()} ${time}`);
-        if (prayerTime > now) {
-          nextPrayer = prayer;
-          nextTime = prayerTime;
-          break;
-        }
-      }
-
-      if (nextPrayer && nextTime) {
-        const diff = nextTime - now;
-
-        const hours = String(Math.floor(diff / 3600000)).padStart(2, '0');
-        const minutes = String(Math.floor((diff % 3600000) / 60000)).padStart(2, '0');
-        const seconds = String(Math.floor((diff % 60000) / 1000)).padStart(2, '0');
-
-        document.getElementById("next-prayer").textContent = `${translations[currentLanguage].nextPrayer} ${translations[currentLanguage].prayers[nextPrayer]}`;
-        document.getElementById("countdown").textContent = `${translations[currentLanguage].timeLeft} ${hours}h ${minutes}m ${seconds}s`;
-      } else {
-        document.getElementById("next-prayer").textContent = "No more prayers for today.";
-        document.getElementById("countdown").textContent = "";
-      }
-    }
-
     function displayHijriDate(prayerTimes) {
       const hijriDate = prayerTimes.date.hijri;
       document.getElementById("hijri-date").textContent = `Hijri Date: ${hijriDate.day} ${hijriDate.month.en} ${hijriDate.year}`;
+    }
+
+    function startCountdown(prayerTimes) {
+      function updateCountdown() {
+        const timings = prayerTimes.timings;
+        const now = new Date();
+
+        const selectedTimings = {
+          Fajr: timings.Fajr,
+          Sunrise: timings.Sunrise,
+          Dhuhr: timings.Dhuhr,
+          Asr: timings.Asr,
+          Maghrib: timings.Maghrib,
+          Isha: timings.Isha,
+        };
+
+        let nextPrayer = null;
+        let nextTime = null;
+
+        for (const [prayer, time] of Object.entries(selectedTimings)) {
+          const prayerTime = new Date(`${now.toDateString()} ${time}`);
+          if (prayerTime > now) {
+            nextPrayer = prayer;
+            nextTime = prayerTime;
+            break;
+          }
+        }
+
+        if (nextPrayer && nextTime) {
+          const diff = nextTime - now;
+
+          const hours = String(Math.floor(diff / 3600000)).padStart(2, '0');
+          const minutes = String(Math.floor((diff % 3600000) / 60000)).padStart(2, '0');
+          const seconds = String(Math.floor((diff % 60000) / 1000)).padStart(2, '0');
+
+          document.getElementById("next-prayer").textContent = `${translations[currentLanguage].nextPrayer} ${translations[currentLanguage].prayers[nextPrayer]}`;
+          document.getElementById("countdown").textContent = `${translations[currentLanguage].timeLeft} ${hours}h ${minutes}m ${seconds}s`;
+        } else {
+          document.getElementById("next-prayer").textContent = "No more prayers for today.";
+          document.getElementById("countdown").textContent = "";
+        }
+      }
+
+      updateCountdown();
+      setInterval(updateCountdown, 1000);
     }
 
     function switchLanguage() {
       currentLanguage = currentLanguage === "en" ? "ar" : "en";
       document.getElementById("title").textContent = translations[currentLanguage].title;
       document.getElementById("switch-lang").textContent = currentLanguage === "en" ? "عربي" : "English";
-      displayPrayerTimes(window.prayerTimes);
-      updateCountdown(window.prayerTimes);
-    }
-
-    function updateLocation() {
-      if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(async function(position) {
-          userLatitude = position.coords.latitude;
-          userLongitude = position.coords.longitude;
-          window.prayerTimes = await fetchPrayerTimes();
-          displayPrayerTimes(window.prayerTimes);
-          displayHijriDate(window.prayerTimes);
-          document.getElementById("date").textContent = new Date().toLocaleDateString();
-          updateCountdown(window.prayerTimes);
-        }, function() {
-          alert("Geolocation is not supported by this browser.");
-        });
-      } else {
-        alert("Geolocation is not supported by this browser.");
-      }
     }
 
     async function main() {
-      updateLocation();
-      setInterval(updateLocation, 1000); // Update location and prayer times every second
+      detectLocation();
+      document.getElementById("date").textContent = new Date().toLocaleDateString();
     }
 
     document.getElementById("switch-lang").addEventListener("click", switchLanguage);
