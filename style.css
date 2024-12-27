@@ -1,0 +1,225 @@
+/* General Body Styling */
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    color: #fff;
+    background: url('assets/background1.jpg') no-repeat center center fixed;
+    background-size: cover;
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start; /* Align content at the top */
+    flex-direction: column; /* Stack content vertically */
+    height: 100vh; /* Ensure full height */
+    padding-top: 20px; /* Add space at the top */
+}
+
+/* Container Styling */
+.container {
+    padding: 20px;
+    max-width: 1200px;
+    margin: 0 auto; /* Center the content */
+    z-index: 2;
+    position: relative;
+}
+
+/* Header Styling */
+header {
+    margin-top: 0;
+    z-index: 2;
+    position: relative;
+}
+
+h1 {
+    font-size: 4rem; /* Larger font for visibility */
+    font-weight: bold;
+    text-shadow: 3px 3px 6px #000;
+}
+
+p {
+    font-size: 2rem; /* Date font size */
+    margin: 5px 0;
+}
+
+/* Prayer Times List */
+#prayer-times {
+    margin-top: 50px;
+}
+
+.prayer {
+    font-size: 2rem; /* Larger font for prayer times */
+    background: rgba(255, 87, 34, 0.8); /* Orange background */
+    padding: 20px;
+    border-radius: 15px;
+    text-shadow: 1px 1px 3px #000;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5); /* Shadow for depth */
+}
+
+/* Next Prayer Section */
+#next-prayer {
+    margin-top: 50px;
+    background: rgba(0, 0, 0, 0.7);
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5); /* Subtle shadow */
+}
+
+#next-prayer-name {
+    font-size: 2.5rem; /* Larger font for next prayer name */
+    font-weight: bold;
+    text-shadow: 2px 2px 5px #000;
+}
+
+#countdown {
+    font-size: 3rem; /* Large countdown */
+    font-weight: bold;
+    color: #ffeb3b;
+}
+
+/* Footer Button Styling */
+footer {
+    margin-top: 50px;
+}
+
+button {
+    padding: 20px 40px;
+    font-size: 2rem; /* Button font size */
+    border: none;
+    background: #ff5722;
+    color: #fff;
+    border-radius: 10px;
+    cursor: pointer;
+    margin: 10px;
+    transition: background 0.3s ease;
+}
+
+button:hover {
+    background: #e64a19; /* Darker orange on hover */
+}
+
+button:focus {
+    outline: none;
+}
+
+/* Media Queries for Responsiveness */
+
+/* For Small Mobile Screens (up to 480px) */
+@media (max-width: 480px) {
+    body {
+        padding-top: 10px; /* Less padding on smaller screens */
+    }
+
+    h1 {
+        font-size: 2.5rem; /* Smaller title */
+    }
+
+    p {
+        font-size: 1.5rem; /* Smaller date text */
+    }
+
+    .prayer {
+        font-size: 1.5rem; /* Smaller prayer times font */
+        padding: 15px;
+    }
+
+    #next-prayer-name {
+        font-size: 2rem; /* Smaller next prayer name font */
+    }
+
+    #countdown {
+        font-size: 2.5rem; /* Smaller countdown */
+    }
+
+    button {
+        padding: 15px 30px;
+        font-size: 1.5rem; /* Smaller buttons */
+    }
+}
+
+/* For Larger Mobile Screens and Tablets (481px to 768px) */
+@media (min-width: 481px) and (max-width: 768px) {
+    h1 {
+        font-size: 3rem; /* Medium title for tablets */
+    }
+
+    p {
+        font-size: 1.8rem; /* Medium date text */
+    }
+
+    .prayer {
+        font-size: 1.8rem; /* Medium prayer times font */
+        padding: 18px;
+    }
+
+    #next-prayer-name {
+        font-size: 2.2rem; /* Medium next prayer name font */
+    }
+
+    #countdown {
+        font-size: 3rem; /* Medium countdown */
+    }
+
+    button {
+        padding: 18px 35px;
+        font-size: 1.8rem; /* Medium buttons */
+    }
+}
+
+/* For Small to Medium Desktops (769px to 1024px) */
+@media (min-width: 769px) and (max-width: 1024px) {
+    h1 {
+        font-size: 4rem; /* Larger title */
+    }
+
+    p {
+        font-size: 2rem; /* Larger date text */
+    }
+
+    .prayer {
+        font-size: 2rem; /* Larger prayer times font */
+        padding: 20px;
+    }
+
+    #next-prayer-name {
+        font-size: 2.5rem; /* Larger next prayer name font */
+    }
+
+    #countdown {
+        font-size: 3.5rem; /* Larger countdown */
+    }
+
+    button {
+        padding: 20px 40px;
+        font-size: 2rem; /* Larger buttons */
+    }
+}
+
+/* For Large Desktops and TVs (1025px and up) */
+@media (min-width: 1025px) {
+    h1 {
+        font-size: 5rem; /* Larger title */
+    }
+
+    p {
+        font-size: 2.5rem; /* Larger date text */
+    }
+
+    .prayer {
+        font-size: 2.5rem; /* Larger prayer times font */
+        padding: 25px;
+    }
+
+    #next-prayer-name {
+        font-size: 3rem; /* Larger next prayer name font */
+    }
+
+    #countdown {
+        font-size: 4rem; /* Larger countdown */
+    }
+
+    button {
+        padding: 25px 50px;
+        font-size: 2.5rem; /* Larger buttons */
+    }
+}

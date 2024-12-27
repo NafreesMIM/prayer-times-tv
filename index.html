@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Muslim Prayer Times</title>
+  <link rel="stylesheet" href="style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet"> <!-- Added Google Font -->
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1 id="title">Muslim Prayer Times</h1>
+      <p id="today-date"></p>
+      <p id="hijri-date"></p>
+    </header>
+
+    <main>
+      <div id="prayer-times">
+        <p>Loading prayer times...</p>
+      </div>
+      <div id="next-prayer">
+        <h2>Next Prayer</h2>
+        <p id="next-prayer-name">Calculating...</p>
+        <p id="countdown">00:00:00</p>
+      </div>
+    </main>
+
+    <footer>
+      <button onclick="changeLanguage('en')">English</button>
+      <button onclick="changeLanguage('ar')">Arabic</button>
+    </footer>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
