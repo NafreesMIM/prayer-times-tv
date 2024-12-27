@@ -81,6 +81,11 @@ p {
 footer {
     margin-top: 50px;
 }
+footer p {
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin: 0;
+}
 
 button {
     padding: 20px 40px;
