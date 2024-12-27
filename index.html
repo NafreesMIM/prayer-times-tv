@@ -183,13 +183,9 @@
     async function fetchPrayerTimes() {
       if (userLatitude && userLongitude) {
         const API_URL = `https://api.aladhan.com/v1/timings?latitude=${userLatitude}&longitude=${userLongitude}`;
-        try {
-          const response = await fetch(API_URL);
-          const data = await response.json();
-          return data.data;
-        } catch (error) {
-          alert("Error fetching prayer times: " + error);
-        }
+        const response = await fetch(API_URL);
+        const data = await response.json();
+        return data.data;
       } else {
         alert("Unable to retrieve your location.");
       }
@@ -261,10 +257,8 @@
     }
 
     function displayHijriDate(prayerTimes) {
-      const hijriDate = prayerTimes.date?.hijri;
-      document.getElementById("hijri-date").textContent = hijriDate 
-        ? `Hijri Date: ${hijriDate.day} ${hijriDate.month.en} ${hijriDate.year}`
-        : "Hijri Date: Not Available";
+      const hijriDate = prayerTimes.date.hijri;
+      document.getElementById("hijri-date").textContent = `Hijri Date: ${hijriDate.day} ${hijriDate.month.en} ${hijriDate.year}`;
     }
 
     function switchLanguage() {
@@ -295,7 +289,7 @@
 
     async function main() {
       updateLocation();
-      setInterval(updateLocation, 60000); // Update prayer times every minute
+      setInterval(() => updateCountdown(window.prayerTimes), 1000); // Update countdown every second
     }
 
     document.getElementById("switch-lang").addEventListener("click", switchLanguage);
