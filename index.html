@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Prayer Times - Makkah Style</title>
+  <title>Prayer Times</title>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
   <style>
     body {
@@ -96,8 +96,8 @@
 <body>
   <div class="container">
     <div class="header">
-      <h1 id="title">Prayer Times - Makkah</h1>
-      <p class="sub-header" id="mosque-name">Al-Masjid al-Haram</p>
+      <h1 id="title">Prayer Times</h1>
+      <p class="sub-header" id="mosque-name">Al-Masjid - [Name]</p>
     </div>
     <p class="sub-header" id="date"></p>
     <p class="sub-header" id="hijri-date"></p>
@@ -139,20 +139,23 @@
       let nextTime = null;
       
       Object.entries(timings).forEach(([prayer, time]) => {
-        const prayerTime = new Date(`${now.toDateString()} ${time}`);
-        if (prayerTime > now && !nextPrayer) {
-          nextPrayer = prayer;
-          nextTime = prayerTime;
+        if (["Fajr", "Dhuhr", "Asr", "Maghrib", "Isha"].includes(prayer)) {
+          const prayerTime = new Date(`${now.toDateString()} ${time}`);
+          if (prayerTime > now && !nextPrayer) {
+            nextPrayer = prayer;
+            nextTime = prayerTime;
+          }
         }
       });
       
       if (nextPrayer && nextTime) {
         const diff = nextTime - now;
         const minutesToNextPrayer = Math.floor(diff / 60000);
+        const secondsToNextPrayer = Math.floor((diff % 60000) / 1000);
         
         if (minutesToNextPrayer <= 10) {
           document.getElementById("next-prayer").textContent = `Next Prayer: ${nextPrayer}`;
-          document.getElementById("countdown").textContent = `Iqamah in ${minutesToNextPrayer}m`;
+          document.getElementById("countdown").textContent = `Iqamah in ${minutesToNextPrayer}m ${secondsToNextPrayer}s`;
         } else {
           const hours = String(Math.floor(diff / 3600000)).padStart(2, '0');
           const minutes = String(Math.floor((diff % 3600000) / 60000)).padStart(2, '0');
