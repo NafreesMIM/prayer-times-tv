@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Prayer Times</title>
+  <title>Prayer Times - Makkah Style</title>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
   <style>
     body {
@@ -24,7 +24,7 @@
       padding: 25px;
       border-radius: 15px;
       box-shadow: 0 6px 20px rgba(0, 0, 0, 0.6);
-      width: 95%;
+      width: 90%;
       max-width: 900px;
       box-sizing: border-box;
     }
@@ -37,26 +37,26 @@
 
     .header h1 {
       font-weight: 700;
-      font-size: 3em;
+      font-size: 2.5em;
       margin: 0;
       text-transform: uppercase;
     }
 
     .sub-header {
-      font-size: 1.3em;
-      margin: 15px 0 25px;
+      font-size: 1.2em;
+      margin: 10px 0 20px;
     }
 
     .prayer-times {
-      margin: 25px 0;
+      margin: 20px 0;
     }
 
     .prayer {
       display: flex;
       justify-content: space-between;
-      margin: 15px 0;
-      padding: 12px;
-      font-size: 1.7em;
+      align-items: center;
+      padding: 10px;
+      font-size: 1.4em;
       background: rgba(255, 255, 255, 0.15);
       border-radius: 8px;
       transition: background 0.3s ease;
@@ -68,36 +68,50 @@
     }
 
     .footer {
-      margin-top: 30px;
+      margin-top: 20px;
     }
 
     .footer p {
-      font-size: 1.3em;
-      margin: 8px 0;
+      font-size: 1.2em;
+      margin: 5px 0;
     }
 
     #author {
-      font-size: 1.2em;
-      margin-top: 15px;
+      font-size: 1em;
+      margin-top: 10px;
       color: #f39c12;
     }
 
     #next-prayer {
       font-weight: 700;
-      font-size: 1.8em;
+      font-size: 1.5em;
     }
 
     #countdown {
-      font-size: 1.5em;
+      font-size: 1.3em;
       color: #f5a623;
+    }
+
+    @media (max-width: 768px) {
+      .container {
+        padding: 15px;
+      }
+
+      .header h1 {
+        font-size: 2em;
+      }
+
+      .prayer {
+        font-size: 1.2em;
+      }
     }
   </style>
 </head>
 <body>
   <div class="container">
     <div class="header">
-      <h1 id="title">Prayer Times</h1>
-      <p class="sub-header" id="mosque-name">Al-Masjid - [Name]</p>
+      <h1 id="title">Prayer Times - Makkah</h1>
+      <p class="sub-header" id="mosque-name">Al-Masjid al-Haram</p>
     </div>
     <p class="sub-header" id="date"></p>
     <p class="sub-header" id="hijri-date"></p>
