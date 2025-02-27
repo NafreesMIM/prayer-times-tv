@@ -116,21 +116,31 @@
     <div class="footer">
       <p id="next-prayer"></p>
       <p id="countdown"></p>
-      <p id="author">Developed by NafreesMIM</p>
+      <p id="author">Developed by Nafrees.MIM</p>
     </div>
   </div>
 
   <script>
+    async function fetchPrayerTimes() {
+      if (userLatitude && userLongitude) {
+        const API_URL = `https://api.aladhan.com/v1/timings?latitude=${userLatitude}&longitude=${userLongitude}`;
+        const response = await fetch(API_URL);
+        const data = await response.json();
+        return data.data;
+      } else {
+        alert("Unable to retrieve your location.");
+      }
+    }
     function updateCountdown(prayerTimes) {
       const timings = prayerTimes.timings;
       const now = new Date();
       
       const selectedTimings = {
         Fajr: timings.Fajr,
-        Sunrise: timings.Sunrise,
+       
         Dhuhr: timings.Dhuhr,
         Asr: timings.Asr,
-        Sunset: timings.Sunset,
+        
         Maghrib: timings.Maghrib,
         Isha: timings.Isha,
       };
