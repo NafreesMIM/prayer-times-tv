@@ -86,20 +86,6 @@
       font-size: 1.3em;
       color: #f5a623;
     }
-
-    @media (max-width: 768px) {
-      .container {
-        padding: 15px;
-      }
-
-      .header h1 {
-        font-size: 2em;
-      }
-
-      .prayer {
-        font-size: 1.2em;
-      }
-    }
   </style>
 </head>
 <body>
@@ -138,37 +124,23 @@
       return `${hours}:${minutes} ${period}`;
     }
 
-    function updateCountdown(prayerTimes) {
+    function updatePrayerTimes(prayerTimes) {
       const timings = prayerTimes.timings;
-      const now = new Date();
-      let nextPrayer = null;
-      let nextTime = null;
-      
+      const prayerContainer = document.getElementById("prayer-times");
+      prayerContainer.innerHTML = "";
       ["Fajr", "Dhuhr", "Asr", "Maghrib", "Isha"].forEach(prayer => {
-        const prayerTime = new Date(`${now.toDateString()} ${timings[prayer]}`);
-        if (prayerTime > now && !nextPrayer) {
-          nextPrayer = prayer;
-          nextTime = prayerTime;
-        }
+        const div = document.createElement("div");
+        div.classList.add("prayer");
+        div.innerHTML = `<span>${prayer}</span><span>${convertTo12HourFormat(timings[prayer])}</span>`;
+        prayerContainer.appendChild(div);
       });
-      
-      if (nextPrayer && nextTime) {
-        setInterval(() => {
-          const diff = nextTime - new Date();
-          const hours = String(Math.floor(diff / 3600000)).padStart(2, '0');
-          const minutes = String(Math.floor((diff % 3600000) / 60000)).padStart(2, '0');
-          const seconds = String(Math.floor((diff % 60000) / 1000)).padStart(2, '0');
-          document.getElementById("next-prayer").textContent = `Next Prayer: ${nextPrayer}`;
-          document.getElementById("countdown").textContent = `Time Left: ${hours}h ${minutes}m ${seconds}s`;
-        }, 1000);
-      }
     }
 
     async function init() {
       const mosqueName = prompt("Enter your mosque name:") || "Local Mosque";
       document.getElementById("mosque-name").textContent = mosqueName;
       const prayerTimes = await fetchPrayerTimes();
-      updateCountdown(prayerTimes);
+      updatePrayerTimes(prayerTimes);
       document.getElementById("date").textContent = `Date: ${prayerTimes.date.readable}`;
       document.getElementById("hijri-date").textContent = `Hijri Date: ${prayerTimes.date.hijri.day} ${prayerTimes.date.hijri.month.en} ${prayerTimes.date.hijri.year}`;
     }
