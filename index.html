@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Prayer Times - Makkah Style</title>
+  <title>Prayer Times</title>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
   <style>
     body {
@@ -92,6 +92,15 @@
       color: #f5a623;
     }
 
+    .language-options {
+      margin-top: 10px;
+    }
+
+    .language-options label {
+      margin-right: 10px;
+      font-size: 1em;
+    }
+
     @media (max-width: 768px) {
       .container {
         padding: 15px;
@@ -110,8 +119,17 @@
 <body>
   <div class="container">
     <div class="header">
-      <h1 id="title">Prayer Times - Makkah</h1>
+      <h1 id="title">Prayer Times</h1>
       <p class="sub-header" id="mosque-name"></p>
+      <div class="language-options">
+        <label><input type="checkbox" id="lang-english" checked> English</label>
+        <label><input type="checkbox" id="lang-arabic"> Arabic</label>
+        <label><input type="checkbox" id="lang-tamil"> Tamil</label>
+        <label><input type="checkbox" id="lang-sinhala"> Sinhala</label>
+        <label><input type="checkbox" id="lang-urdu"> Urdu</label>
+        <label><input type="checkbox" id="lang-malayalam"> Malayalam</label>
+        <label><input type="checkbox" id="lang-japanese"> Japanese</label>
+      </div>
     </div>
     <p class="sub-header" id="date"></p>
     <p class="sub-header" id="hijri-date"></p>
@@ -126,10 +144,23 @@
   </div>
 
   <script>
-    async function fetchPrayerTimes(city, country, mosqueName) {
-      const response = await fetch(`https://api.aladhan.com/v1/timingsByCity?city=${city}&country=${country}&method=2`);
+    async function fetchPrayerTimes(mosqueName) {
+      const response = await fetch(`https://api.aladhan.com/v1/timingsByCity?city=Makkah&country=Saudi%20Arabia&method=2`);
       const data = await response.json();
       return data.data;
+    }
+
+    function convertTo12HourFormat(time) {
+      let [hours, minutes] = time.split(':');
+      let period = 'AM';
+      hours = parseInt(hours, 10);
+      if (hours >= 12) {
+        period = 'PM';
+        if (hours > 12) hours -= 12;
+      } else if (hours === 0) {
+        hours = 12;
+      }
+      return `${hours}:${minutes} ${period}`;
     }
 
     function updatePrayerTimes(prayerTimes) {
@@ -141,57 +172,19 @@
       selectedPrayers.forEach(prayer => {
         const div = document.createElement("div");
         div.classList.add("prayer");
-        div.innerHTML = `<span>${prayer}</span><span>${timings[prayer]}</span>`;
+        const formattedTime = convertTo12HourFormat(timings[prayer]);
+        div.innerHTML = `<span>${prayer}</span><span>${formattedTime}</span>`;
         prayerContainer.appendChild(div);
       });
     }
 
-    function updateCountdown(prayerTimes) {
-      const timings = prayerTimes.timings;
-      const now = new Date();
-      let nextPrayer = null;
-      let nextTime = null;
-      
-      Object.entries(timings).forEach(([prayer, time]) => {
-        if (["Fajr", "Dhuhr", "Asr", "Maghrib", "Isha"].includes(prayer)) {
-          const prayerTime = new Date(`${now.toDateString()} ${time}`);
-          if (prayerTime > now && !nextPrayer) {
-            nextPrayer = prayer;
-            nextTime = prayerTime;
-          }
-        }
-      });
-      
-      if (nextPrayer && nextTime) {
-        const diff = nextTime - now;
-        const minutesToNextPrayer = Math.floor(diff / 60000);
-        const secondsToNextPrayer = Math.floor((diff % 60000) / 1000);
-        
-        if (minutesToNextPrayer <= 10) {
-          document.getElementById("next-prayer").textContent = `Next Prayer: ${nextPrayer}`;
-          document.getElementById("countdown").textContent = `Iqamah in ${minutesToNextPrayer}m ${secondsToNextPrayer}s`;
-        } else {
-          const hours = String(Math.floor(diff / 3600000)).padStart(2, '0');
-          const minutes = String(Math.floor((diff % 3600000) / 60000)).padStart(2, '0');
-          const seconds = String(Math.floor((diff % 60000) / 1000)).padStart(2, '0');
-          
-          document.getElementById("next-prayer").textContent = `Next Prayer: ${nextPrayer}`;
-          document.getElementById("countdown").textContent = `Time Left: ${hours}h ${minutes}m ${seconds}s`;
-        }
-      }
-    }
-
     async function init() {
-      const city = prompt("Enter your city:") || "Makkah";
-      const country = prompt("Enter your country:") || "Saudi Arabia";
       const mosqueName = prompt("Enter your mosque name:") || "Local Mosque";
-      const prayerTimes = await fetchPrayerTimes(city, country, mosqueName);
       document.getElementById("mosque-name").textContent = mosqueName;
+      const prayerTimes = await fetchPrayerTimes(mosqueName);
       updatePrayerTimes(prayerTimes);
       document.getElementById("date").textContent = `Date: ${prayerTimes.date.readable}`;
       document.getElementById("hijri-date").textContent = `Hijri Date: ${prayerTimes.date.hijri.day} ${prayerTimes.date.hijri.month.en} ${prayerTimes.date.hijri.year}`;
-      
-      setInterval(() => updateCountdown(prayerTimes), 1000);
     }
 
     init();
