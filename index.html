@@ -121,30 +121,28 @@
     <div class="header">
       <h1 id="title">Prayer Times</h1>
       <p class="sub-header" id="mosque-name"></p>
-      <div class="language-options">
-        <label><input type="checkbox" id="lang-english" checked> English</label>
-        <label><input type="checkbox" id="lang-arabic"> Arabic</label>
-        <label><input type="checkbox" id="lang-tamil"> Tamil</label>
-        <label><input type="checkbox" id="lang-sinhala"> Sinhala</label>
-        <label><input type="checkbox" id="lang-urdu"> Urdu</label>
-        <label><input type="checkbox" id="lang-malayalam"> Malayalam</label>
-        <label><input type="checkbox" id="lang-japanese"> Japanese</label>
-      </div>
     </div>
     <p class="sub-header" id="date"></p>
     <p class="sub-header" id="hijri-date"></p>
-
+    <div class="language-options">
+      <label><input type="checkbox" class="lang-checkbox" value="English" checked> English</label>
+      <label><input type="checkbox" class="lang-checkbox" value="Arabic"> Arabic</label>
+      <label><input type="checkbox" class="lang-checkbox" value="Tamil"> Tamil</label>
+      <label><input type="checkbox" class="lang-checkbox" value="Sinhala"> Sinhala</label>
+      <label><input type="checkbox" class="lang-checkbox" value="Urdu"> Urdu</label>
+      <label><input type="checkbox" class="lang-checkbox" value="Malayalam"> Malayalam</label>
+      <label><input type="checkbox" class="lang-checkbox" value="Japanese"> Japanese</label>
+    </div>
     <div class="prayer-times" id="prayer-times"></div>
-
     <div class="footer">
       <p id="next-prayer"></p>
       <p id="countdown"></p>
-      <p id="author">Developed by Iqbal Nafrees</p>
+      <p id="author">Developed by Nafrees.MIM</p>
     </div>
   </div>
 
   <script>
-    async function fetchPrayerTimes(mosqueName) {
+    async function fetchPrayerTimes() {
       const response = await fetch(`https://api.aladhan.com/v1/timingsByCity?city=Makkah&country=Saudi%20Arabia&method=2`);
       const data = await response.json();
       return data.data;
@@ -167,13 +165,11 @@
       const timings = prayerTimes.timings;
       const prayerContainer = document.getElementById("prayer-times");
       prayerContainer.innerHTML = "";
-      
       const selectedPrayers = ["Fajr", "Dhuhr", "Asr", "Maghrib", "Isha"];
       selectedPrayers.forEach(prayer => {
         const div = document.createElement("div");
         div.classList.add("prayer");
-        const formattedTime = convertTo12HourFormat(timings[prayer]);
-        div.innerHTML = `<span>${prayer}</span><span>${formattedTime}</span>`;
+        div.innerHTML = `<span>${prayer}</span><span>${convertTo12HourFormat(timings[prayer])}</span>`;
         prayerContainer.appendChild(div);
       });
     }
@@ -181,13 +177,12 @@
     async function init() {
       const mosqueName = prompt("Enter your mosque name:") || "Local Mosque";
       document.getElementById("mosque-name").textContent = mosqueName;
-      const prayerTimes = await fetchPrayerTimes(mosqueName);
+      const prayerTimes = await fetchPrayerTimes();
       updatePrayerTimes(prayerTimes);
       document.getElementById("date").textContent = `Date: ${prayerTimes.date.readable}`;
       document.getElementById("hijri-date").textContent = `Hijri Date: ${prayerTimes.date.hijri.day} ${prayerTimes.date.hijri.month.en} ${prayerTimes.date.hijri.year}`;
     }
-
-    init();
+    document.addEventListener("DOMContentLoaded", init);
   </script>
 </body>
 </html>
