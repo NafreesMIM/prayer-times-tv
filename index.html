@@ -62,11 +62,6 @@
       transition: background 0.3s ease;
     }
 
-    .current-prayer {
-      background: #f5a623 !important;
-      color: black;
-    }
-
     .footer {
       margin-top: 20px;
     }
@@ -92,15 +87,6 @@
       color: #f5a623;
     }
 
-    .language-options {
-      margin-top: 10px;
-    }
-
-    .language-options label {
-      margin-right: 10px;
-      font-size: 1em;
-    }
-
     @media (max-width: 768px) {
       .container {
         padding: 15px;
@@ -124,20 +110,11 @@
     </div>
     <p class="sub-header" id="date"></p>
     <p class="sub-header" id="hijri-date"></p>
-    <div class="language-options">
-      <label><input type="checkbox" class="lang-checkbox" value="English" checked> English</label>
-      <label><input type="checkbox" class="lang-checkbox" value="Arabic"> Arabic</label>
-      <label><input type="checkbox" class="lang-checkbox" value="Tamil"> Tamil</label>
-      <label><input type="checkbox" class="lang-checkbox" value="Sinhala"> Sinhala</label>
-      <label><input type="checkbox" class="lang-checkbox" value="Urdu"> Urdu</label>
-      <label><input type="checkbox" class="lang-checkbox" value="Malayalam"> Malayalam</label>
-      <label><input type="checkbox" class="lang-checkbox" value="Japanese"> Japanese</label>
-    </div>
     <div class="prayer-times" id="prayer-times"></div>
     <div class="footer">
       <p id="next-prayer"></p>
       <p id="countdown"></p>
-      <p id="author">Developed by Nafrees.MIM</p>
+      <p id="author">Developed by Iqbal Nafrees</p>
     </div>
   </div>
 
@@ -161,24 +138,37 @@
       return `${hours}:${minutes} ${period}`;
     }
 
-    function updatePrayerTimes(prayerTimes) {
+    function updateCountdown(prayerTimes) {
       const timings = prayerTimes.timings;
-      const prayerContainer = document.getElementById("prayer-times");
-      prayerContainer.innerHTML = "";
-      const selectedPrayers = ["Fajr", "Dhuhr", "Asr", "Maghrib", "Isha"];
-      selectedPrayers.forEach(prayer => {
-        const div = document.createElement("div");
-        div.classList.add("prayer");
-        div.innerHTML = `<span>${prayer}</span><span>${convertTo12HourFormat(timings[prayer])}</span>`;
-        prayerContainer.appendChild(div);
+      const now = new Date();
+      let nextPrayer = null;
+      let nextTime = null;
+      
+      ["Fajr", "Dhuhr", "Asr", "Maghrib", "Isha"].forEach(prayer => {
+        const prayerTime = new Date(`${now.toDateString()} ${timings[prayer]}`);
+        if (prayerTime > now && !nextPrayer) {
+          nextPrayer = prayer;
+          nextTime = prayerTime;
+        }
       });
+      
+      if (nextPrayer && nextTime) {
+        setInterval(() => {
+          const diff = nextTime - new Date();
+          const hours = String(Math.floor(diff / 3600000)).padStart(2, '0');
+          const minutes = String(Math.floor((diff % 3600000) / 60000)).padStart(2, '0');
+          const seconds = String(Math.floor((diff % 60000) / 1000)).padStart(2, '0');
+          document.getElementById("next-prayer").textContent = `Next Prayer: ${nextPrayer}`;
+          document.getElementById("countdown").textContent = `Time Left: ${hours}h ${minutes}m ${seconds}s`;
+        }, 1000);
+      }
     }
 
     async function init() {
       const mosqueName = prompt("Enter your mosque name:") || "Local Mosque";
       document.getElementById("mosque-name").textContent = mosqueName;
       const prayerTimes = await fetchPrayerTimes();
-      updatePrayerTimes(prayerTimes);
+      updateCountdown(prayerTimes);
       document.getElementById("date").textContent = `Date: ${prayerTimes.date.readable}`;
       document.getElementById("hijri-date").textContent = `Hijri Date: ${prayerTimes.date.hijri.day} ${prayerTimes.date.hijri.month.en} ${prayerTimes.date.hijri.year}`;
     }
