@@ -111,7 +111,7 @@
   <div class="container">
     <div class="header">
       <h1 id="title">Prayer Times - Makkah</h1>
-      <p class="sub-header" id="mosque-name">Al-Masjid al-Haram</p>
+      <p class="sub-header" id="mosque-name"></p>
     </div>
     <p class="sub-header" id="date"></p>
     <p class="sub-header" id="hijri-date"></p>
@@ -121,13 +121,13 @@
     <div class="footer">
       <p id="next-prayer"></p>
       <p id="countdown"></p>
-      <p id="author">Developed by Nafrees.MIM</p>
+      <p id="author">Developed by Iqbal Nafrees</p>
     </div>
   </div>
 
   <script>
-    async function fetchPrayerTimes() {
-      const response = await fetch('https://api.aladhan.com/v1/timingsByCity?city=Makkah&country=Saudi%20Arabia&method=2');
+    async function fetchPrayerTimes(city, country, mosqueName) {
+      const response = await fetch(`https://api.aladhan.com/v1/timingsByCity?city=${city}&country=${country}&method=2`);
       const data = await response.json();
       return data.data;
     }
@@ -182,7 +182,11 @@
     }
 
     async function init() {
-      const prayerTimes = await fetchPrayerTimes();
+      const city = prompt("Enter your city:") || "Makkah";
+      const country = prompt("Enter your country:") || "Saudi Arabia";
+      const mosqueName = prompt("Enter your mosque name:") || "Local Mosque";
+      const prayerTimes = await fetchPrayerTimes(city, country, mosqueName);
+      document.getElementById("mosque-name").textContent = mosqueName;
       updatePrayerTimes(prayerTimes);
       document.getElementById("date").textContent = `Date: ${prayerTimes.date.readable}`;
       document.getElementById("hijri-date").textContent = `Hijri Date: ${prayerTimes.date.hijri.day} ${prayerTimes.date.hijri.month.en} ${prayerTimes.date.hijri.year}`;
