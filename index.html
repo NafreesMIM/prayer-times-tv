@@ -101,7 +101,7 @@
   <div class="container">
     <div class="header">
       <h1 id="title">Prayer Times</h1>
-      <input type="text" id="mosque-name" placeholder="Enter Mosque Name" oninput="updateMosqueName()">
+      <p></p>
     </div>
     <p class="sub-header" id="date"></p>
     <p class="sub-header" id="hijri-date"></p>
@@ -186,10 +186,15 @@
       });
     }
 
-    function updateMosqueName() {
-      const mosqueName = document.getElementById("mosque-name").value;
-      document.getElementById("title").textContent = mosqueName ? mosqueName : "Prayer Times";
+    function askMosqueName() {
+      let mosqueName = "";
+      while (!mosqueName) {
+        mosqueName = prompt("Enter your Mosque Name:");
+      }
+      document.title = mosqueName;
+      document.body.innerHTML = `<div class='container'><div class='header'><h1>${mosqueName}</h1></div></div>`;
     }
+    document.addEventListener("DOMContentLoaded", askMosqueName);
 
     document.addEventListener("DOMContentLoaded", detectLocation);
   </script>
