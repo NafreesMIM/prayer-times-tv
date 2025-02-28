@@ -53,12 +53,13 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 10px;
+      padding: 12px 15px; /* Slightly increased padding */
       font-size: 1.4em;
       background: rgba(255, 255, 255, 0.15);
       border-radius: 8px;
       transition: background 0.3s ease;
-      margin: 5px 0;
+      margin: 6px 0;
+      flex-wrap: wrap; /* Ensures better wrapping on smaller screens */
     }
 
     #next-prayer {
@@ -92,9 +93,10 @@
       }
 
       .prayer {
-        font-size: 1.2em;
-        flex-direction: column;
-        padding: 15px;
+        font-size: 1.3em; /* Reduce font size slightly */
+        padding: 10px;
+        flex-direction: column; /* Stack items vertically */
+        text-align: center;
       }
 
       #next-prayer {
@@ -121,9 +123,10 @@
       }
 
       .prayer {
-        font-size: 1.1em;
-        flex-direction: column;
-        padding: 12px;
+        font-size: 1.2em; /* Further reduce font size */
+        padding: 8px;
+        margin: 4px 0;
+        border-radius: 6px;
       }
 
       #next-prayer {
